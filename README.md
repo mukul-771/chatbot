@@ -110,6 +110,3 @@ The application includes error handling for:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## Support
-
-For support, please open an issue in the repository or contact [your contact information].
