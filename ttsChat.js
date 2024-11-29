@@ -9,7 +9,6 @@ const FormData = require("form-data");
 const Speaker = require("speaker");
 const OpenAI = require("openai");
 require("dotenv").config();
-const path = require('path');
 
 // Set the path for FFmpeg, used for audio processing
 ffmpeg.setFfmpegPath(ffmpegPath);
@@ -77,26 +76,21 @@ const setupReadlineInterface = () => {
 
 // Function to start recording audio from the microphone
 const startRecording = () => {
-  try {
-    mic = new Microphone();
-    outputFile = fs.createWriteStream("output.wav");
-    micStream = mic.startRecording();
+  mic = new Microphone();
+  outputFile = fs.createWriteStream("output.wav");
+  micStream = mic.startRecording();
 
-    // Write incoming data to the output file
-    micStream.on("data", (data) => {
-      outputFile.write(data);
-    });
+  // Write incoming data to the output file
+  micStream.on("data", (data) => {
+    outputFile.write(data);
+  });
 
-    // Handle microphone errors
-    micStream.on("error", (error) => {
-      console.error("Error: ", error);
-    });
+  // Handle microphone errors
+  micStream.on("error", (error) => {
+    console.error("Error: ", error);
+  });
 
-    console.log("Recording... Press Enter to stop");
-  } catch (error) {
-    console.error("Failed to initialize microphone:", error);
-    process.exit(1);
-  }
+  console.log("Recording... Press Enter to stop");
 };
 
 // Function to stop recording and process the audio
@@ -234,48 +228,5 @@ async function transcribeAndChat() {
   }
 }
 
-const cleanupOutputFile = () => {
-  const outputPath = path.join(__dirname, 'output.wav');
-  if (fs.existsSync(outputPath)) {
-    fs.unlinkSync(outputPath);
-  }
-};
-
-// Add to process exit
-process.on('SIGINT', () => {
-  cleanupOutputFile();
-  process.exit();
-});
-
 // Initialize the readline interface
 setupReadlineInterface();
-
-const config = {
-  openai: {
-    model: "gpt-3.5-turbo",
-    voice: "echo",
-    ttsModel: "tts-1",
-  },
-  audio: {
-    channels: 2,
-    bitDepth: 16,
-    sampleRate: 44100,
-  },
-  maxRetries: 3,
-  outputFile: "output.wav"
-};
-
-// Then use these settings throughout your code
-// Example:
-const speaker = new Speaker({
-  channels: config.audio.channels,
-  bitDepth: config.audio.bitDepth,
-  sampleRate: config.audio.sampleRate,
-});
-
-const MAX_HISTORY = 10;
-
-// In transcribeAndChat function:
-if (chatHistory.length > MAX_HISTORY * 2) { // *2 because each interaction has user + assistant message
-  chatHistory = chatHistory.slice(-MAX_HISTORY * 2);
-}
